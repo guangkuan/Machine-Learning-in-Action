@@ -80,6 +80,7 @@ def splitDataSet(dataSet, axis, value):
             # [axis+1:]表示从跳过 axis的 axis+1行，取接下来的数据
             # 收集结果值 axis列为value的行【该行需要排除axis列】
             retDataSet.append(reducedFeatVec)
+            # print('retDataSet = ', retDataSet)
     return retDataSet
 
 def chooseBestFeatureToSplit(dataSet):
@@ -167,3 +168,40 @@ def createTree(dataSet, labels):
         myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet, bestFeat, value), subLabels)
         # print 'myTree', value, myTree
     return myTree
+
+def classify(inputTree, featLabels, testVec):
+    """classify(给输入的节点，进行分类)
+
+    Args:
+        inputTree  决策树模型
+        featLabels Feature标签对应的名称
+        testVec    测试输入的数据
+    Returns:
+        classLabel 分类的结果值，需要映射label才能知道名称
+    """
+    # 获取tree的根节点对于的key值
+    firstSides = list(inputTree.keys()) 
+    firstStr = firstSides[0]#找到输入的第一个元素
+    # 通过key得到根节点对应的value
+    secondDict = inputTree[firstStr]
+    # 判断根节点名称获取根节点在label中的先后顺序，这样就知道输入的testVec怎么开始对照树来做分类
+    featIndex = featLabels.index(firstStr)
+    # 测试数据，找到根节点对应的label位置，也就知道从输入的数据的第几位来开始分类
+    for key in secondDict.keys():
+        if testVec[featIndex] == key:
+            if type(secondDict[key]).__name__ == 'dict':
+                classLabel = classify(secondDict[key], featLabels, testVec)
+            else:
+                classLabel = secondDict[key]
+    return classLabel
+
+def storeTree(inputTree, filename):
+    import pickle
+    fw = open(filename, 'wb')#以二进制写入
+    pickle.dump(inputTree, fw)
+    fw.close()
+
+def grabTree(filename):
+    import pickle
+    fr = open(filename,'rb')#以二进制读
+    return pickle.load(fr)

@@ -42,3 +42,15 @@ reload(trees)
 myDat, labels = trees.createDataSet()
 myTree = trees.createTree(myDat, labels)
 myTree
+
+#for the classify
+myDat, labels = trees.createDataSet()
+labels
+myTree = treePlotter.retrieveTree (0)
+myTree
+trees.classify(myTree, labels, [1, 0])
+trees.classify(myTree, labels, [1, 1])
+
+#for the storTree
+trees.storeTree(myTree, 'classifierStorage.txt')
+trees.grabTree('classifierStorage.txt')
